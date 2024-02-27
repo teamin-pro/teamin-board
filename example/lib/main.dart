@@ -94,7 +94,7 @@ class _BoardExampleScreenState extends State<BoardExampleScreen> {
                   },
                   items: [
                     for (final item in items)
-                      ColumnItem<int>(
+                      ColumnItem(
                         key: item,
                         builder: (context) {
                           return Card(

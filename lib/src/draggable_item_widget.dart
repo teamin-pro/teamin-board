@@ -9,7 +9,7 @@ import 'package:teamin_board/teamin_board.dart';
 
 typedef DragChildBuilder = Widget Function(BuildContext context, Widget child);
 
-class DragItemVm<T extends Object> {
+class DragItemVm {
   DragItemVm({
     required this.columnItem,
     required this.direction,
@@ -41,19 +41,19 @@ class DragItemVm<T extends Object> {
       _dratStartedSize?.center(Offset.zero) ?? Offset.zero;
 }
 
-class DragItem<T extends Object> extends StatefulWidget {
+class DragItem extends StatefulWidget {
   const DragItem({
     super.key,
     required this.vm,
   });
 
-  final DragItemVm<T> vm;
+  final DragItemVm vm;
 
   @override
-  State<DragItem<T>> createState() => _DragItemState<T>();
+  State<DragItem> createState() => _DragItemState();
 }
 
-class _DragItemState<T extends Object> extends State<DragItem<T>> {
+class _DragItemState<T> extends State<DragItem> {
   DragItemSide? _dragItemSide;
   // Used to determine the direction of the drag.
   Offset? _lastOffset;
@@ -117,9 +117,9 @@ class _DragItemState<T extends Object> extends State<DragItem<T>> {
   Widget build(BuildContext context) {
     final vm = widget.vm;
     final onItemDropped = vm.onItemDropped;
-    if (onItemDropped == null) return _Draggable<T>(vm: vm);
+    if (onItemDropped == null) return _Draggable(vm: vm);
 
-    return DragTarget<DragItemVm<T>>(
+    return DragTarget<DragItemVm>(
       onWillAcceptWithDetails: (details) {
         final dragToItself = details.data.columnItem.key == vm.columnItem.key;
         final dragToDifferentAxis = details.data.direction != vm.direction;
@@ -197,7 +197,7 @@ class _DragItemState<T extends Object> extends State<DragItem<T>> {
                 child: candidatePreview,
               ),
             Flexible(
-              child: _Draggable<T>(vm: vm),
+              child: _Draggable(vm: vm),
             ),
             if (showPreviewAfter)
               Padding(
@@ -220,16 +220,16 @@ class _DragItemState<T extends Object> extends State<DragItem<T>> {
   }
 }
 
-class _Draggable<T extends Object> extends StatefulWidget {
-  const _Draggable({super.key, required this.vm});
+class _Draggable extends StatefulWidget {
+  const _Draggable({required this.vm});
 
-  final DragItemVm<T> vm;
+  final DragItemVm vm;
 
   @override
-  State<_Draggable<T>> createState() => _DraggableState<T>();
+  State<_Draggable> createState() => _DraggableState();
 }
 
-class _DraggableState<T extends Object> extends State<_Draggable<T>> {
+class _DraggableState<T> extends State<_Draggable> {
   @override
   void initState() {
     widget.vm._dratStartedSize = null;
@@ -259,7 +259,7 @@ class _DraggableState<T extends Object> extends State<_Draggable<T>> {
 
     if (!vm.columnItem.isDraggable) return childWithPadding;
 
-    return _PressDraggable<DragItemVm<T>>(
+    return _PressDraggable<DragItemVm>(
       data: vm,
       maxSimultaneousDrags: 1,
       feedback: Builder(builder: (context) {

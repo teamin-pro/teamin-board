@@ -44,13 +44,17 @@ class ItemBoardPosition extends BoardPosition {
   int get hashCode => Object.hash(columnIndex, columnItemIndex);
 }
 
+/// The builder to decorate the column.
+///
+/// The [column] is the column widget.
+/// The [isHovered] is true when the column is hovered by card.
 typedef ColumnDecorationBuilder = Widget Function(
   BuildContext context,
   Widget column,
   bool isHovered,
 );
 
-class BoardColumn<ColumnKey extends Object, ItemKey extends Object> {
+class BoardColumn {
   BoardColumn({
     required this.key,
     required this.items,
@@ -59,21 +63,18 @@ class BoardColumn<ColumnKey extends Object, ItemKey extends Object> {
     this.scrollController,
   });
 
-  final ColumnKey key;
-  final List<ColumnItem<ItemKey>> items;
+  final Object key;
+  final List<ColumnItem> items;
   final ScrollController? scrollController;
 
   /// By default, the column is draggable when the [TeaminBoard.onColumnMoved] is provided.
   final bool? isDraggable;
 
   /// The builder to decorate the column.
-  ///
-  /// The [column] is the column widget.
-  /// The [isHovered] is true when the column is hovered by card.
   final ColumnDecorationBuilder columnDecorationBuilder;
 }
 
-class ColumnItem<K extends Object> {
+class ColumnItem {
   const ColumnItem({
     required this.key,
     required this.builder,
@@ -81,7 +82,7 @@ class ColumnItem<K extends Object> {
     this.dragTriggerMode,
   });
 
-  final K key;
+  final Object key;
   final WidgetBuilder builder;
   final bool isDraggable;
 

@@ -20,8 +20,7 @@ typedef OnItemMovedToColumn = void Function(
   int toColumn,
 );
 
-class TeaminBoard<ItemKey extends Object, ColumnKey extends Object>
-    extends StatefulWidget {
+class TeaminBoard extends StatefulWidget {
   const TeaminBoard({
     super.key,
     required this.columns,
@@ -34,7 +33,7 @@ class TeaminBoard<ItemKey extends Object, ColumnKey extends Object>
     this.end,
   });
 
-  final List<BoardColumn<ColumnKey, ItemKey>> columns;
+  final List<BoardColumn> columns;
   final BoardConfig boardConfig;
 
   /// Called when an item is moved from one position to another.
@@ -52,15 +51,14 @@ class TeaminBoard<ItemKey extends Object, ColumnKey extends Object>
   final ScrollController? boardScrollController;
 
   @override
-  State<TeaminBoard> createState() => _TeaminBoardState<ItemKey, ColumnKey>();
+  State<TeaminBoard> createState() => _TeaminBoardState();
 }
 
-class _TeaminBoardState<ItemKey extends Object, ColumnKey extends Object>
-    extends State<TeaminBoard<ItemKey, ColumnKey>>
+class _TeaminBoardState extends State<TeaminBoard>
     with SingleTickerProviderStateMixin {
   final _dragController = DragController();
   final _defaultBoardHorizontalScrollController = ScrollController();
-  final _columnsScrollControllers = <ColumnKey, ScrollController>{};
+  final _columnsScrollControllers = <Object, ScrollController>{};
   late final _flutterView = View.of(context);
   late final _boardScrollController = BoardScrollController(
     vsync: this,
@@ -144,7 +142,7 @@ class _TeaminBoardState<ItemKey extends Object, ColumnKey extends Object>
             () => ScrollController(debugLabel: column.key.toString()),
           );
       columnsChildren.add(
-        DragItem<ColumnKey>(
+        DragItem(
           vm: DragItemVm(
             childWhenDraggingBuilder: config.childWhenDraggingBuilder,
             feedbackBuilder: config.feedbackBuilder,
@@ -175,7 +173,7 @@ class _TeaminBoardState<ItemKey extends Object, ColumnKey extends Object>
               builder: (_) => MetaData(
                 // Provide column scroll controller that can be received from the `WidgetsBinding.hitTestInView`.
                 metaData: scrollController,
-                child: ColumnHover<ItemKey>(
+                child: ColumnHover(
                   dragController: _dragController,
                   enabled: widget.onItemMovedToColumn != null,
                   onItemDropped: () {
@@ -248,7 +246,7 @@ class _TeaminBoardState<ItemKey extends Object, ColumnKey extends Object>
       controller: scrollController,
       itemCount: column.items.length,
       itemBuilder: (context, index) {
-        return DragItem<ItemKey>(
+        return DragItem(
           vm: DragItemVm(
             childWhenDraggingBuilder: config.childWhenDraggingBuilder,
             feedbackBuilder: config.feedbackBuilder,

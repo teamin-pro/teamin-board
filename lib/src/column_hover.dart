@@ -3,7 +3,7 @@ import 'package:teamin_board/src/drag_controller.dart';
 import 'package:teamin_board/src/draggable_item_widget.dart';
 import 'package:teamin_board/src/utils.dart';
 
-class ColumnHover<ItemKey extends Object> extends StatelessWidget {
+class ColumnHover extends StatelessWidget {
   const ColumnHover({
     super.key,
     required this.onItemDropped,
@@ -19,7 +19,7 @@ class ColumnHover<ItemKey extends Object> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DragTarget<DragItemVm<ItemKey>>(
+    return DragTarget<DragItemVm>(
       onWillAcceptWithDetails: (details) {
         return enabled &&
             details.data.itemBoardPosition.columnIndex !=
