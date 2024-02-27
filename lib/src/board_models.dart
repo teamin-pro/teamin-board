@@ -76,13 +76,13 @@ class BoardColumn<ColumnKey extends Object, ItemKey extends Object> {
 class ColumnItem<K extends Object> {
   const ColumnItem({
     required this.key,
-    required this.child,
+    required this.builder,
     this.isDraggable = true,
     this.dragTriggerMode,
   });
 
   final K key;
-  final Widget child;
+  final WidgetBuilder builder;
   final bool isDraggable;
 
   /// The mode to trigger the drag.

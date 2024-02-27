@@ -172,7 +172,7 @@ class _TeaminBoardState<ItemKey extends Object, ColumnKey extends Object>
             columnItem: ColumnItem(
               key: column.key,
               isDraggable: column.isDraggable ?? widget.onColumnMoved != null,
-              child: MetaData(
+              builder: (_) => MetaData(
                 // Provide column scroll controller that can be received from the `WidgetsBinding.hitTestInView`.
                 metaData: scrollController,
                 child: ColumnHover<ItemKey>(

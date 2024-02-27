@@ -170,7 +170,8 @@ class _DragItemState<T extends Object> extends State<DragItem<T>> {
       builder: (context, candidateData, rejectedData) {
         final candidate = candidateData.firstOrNull;
         final candidatePreview = candidate != null
-            ? vm.childPreviewBuilder(context, candidate.columnItem.child)
+            ? vm.childPreviewBuilder(
+                context, candidate.columnItem.builder(context))
             : null;
         final showPreviewBefore =
             candidatePreview != null && _dragItemSide == DragItemSide.before;
@@ -244,7 +245,6 @@ class _DraggableState<T extends Object> extends State<_Draggable<T>> {
   @override
   Widget build(BuildContext context) {
     final vm = widget.vm;
-    if (!vm.columnItem.isDraggable) return vm.columnItem.child;
     final placeholder = SizedBox(
       width: vm.direction.isVertical ? double.infinity : null,
       height: vm.direction.isHorizontal ? double.infinity : null,
@@ -254,8 +254,10 @@ class _DraggableState<T extends Object> extends State<_Draggable<T>> {
       padding: vm.dragItemListPosition
           .padding(vm.spacing)
           .transposeWhenHorizontal(vm.direction),
-      child: vm.columnItem.child,
+      child: vm.columnItem.builder(context),
     );
+
+    if (!vm.columnItem.isDraggable) return childWithPadding;
 
     return _PressDraggable<DragItemVm<T>>(
       data: vm,

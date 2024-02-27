@@ -96,19 +96,21 @@ class _BoardExampleScreenState extends State<BoardExampleScreen> {
                     for (final item in items)
                       ColumnItem<int>(
                         key: item,
-                        child: Card(
-                          elevation: 0,
-                          margin: EdgeInsets.zero,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8),
-                            child: SizedBox(
-                              width: double.infinity,
-                              child: Text(
-                                '$item ${item % 5 == 0 ? _shortText : (item.isOdd ? _largeText : _mediumText)}',
+                        builder: (context) {
+                          return Card(
+                            elevation: 0,
+                            margin: EdgeInsets.zero,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: SizedBox(
+                                width: double.infinity,
+                                child: Text(
+                                  '$item ${item % 5 == 0 ? _shortText : (item.isOdd ? _largeText : _mediumText)}',
+                                ),
                               ),
                             ),
-                          ),
-                        ),
+                          );
+                        },
                       ),
                   ],
                 ),
