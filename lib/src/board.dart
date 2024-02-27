@@ -185,21 +185,15 @@ class _TeaminBoardState extends State<TeaminBoard>
                     }
                   },
                   builder: (isHovered) {
-                    final child = ConstraintsTransformBox(
-                      // Set max width to the column if it's not set in the `columnDecorationBuilder`.
-                      constraintsTransform: (constraints) {
-                        return constraints.hasBoundedWidth
-                            ? constraints
-                            : constraints.copyWith(
-                                maxWidth: config.maxColumnWidth,
-                              );
-                      },
-                      child: _buildColumnList(columnIndex, scrollController),
-                    );
-                    return column.columnDecorationBuilder(
-                      context,
-                      child,
-                      isHovered,
+                    return ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: config.maxColumnWidth,
+                      ),
+                      child: column.columnDecorationBuilder(
+                        context,
+                        _buildColumnList(columnIndex, scrollController),
+                        isHovered,
+                      ),
                     );
                   },
                 ),
