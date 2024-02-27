@@ -174,7 +174,6 @@ class _TeaminBoardState extends State<TeaminBoard>
                 // Provide column scroll controller that can be received from the `WidgetsBinding.hitTestInView`.
                 metaData: scrollController,
                 child: ColumnHover(
-                  dragController: _dragController,
                   enabled: widget.onItemMovedToColumn != null,
                   onItemDropped: () {
                     if (_dragController.startItemPosition?.columnIndex !=
@@ -192,7 +191,9 @@ class _TeaminBoardState extends State<TeaminBoard>
                       child: column.columnDecorationBuilder(
                         context,
                         _buildColumnList(columnIndex, scrollController),
-                        isHovered,
+                        isHovered &&
+                            _dragController.startItemPosition?.columnIndex !=
+                                columnIndex,
                       ),
                     );
                   },

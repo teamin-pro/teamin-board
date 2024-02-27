@@ -123,7 +123,8 @@ class _BoardExampleScreenState extends State<BoardExampleScreen> {
             },
             // Uncomment this to test item to column mode.
             // onItemMovedToColumn: (from, toColumn) {
-            //   _onItemMoved(from, ItemBoardPosition(columnIndex: toColumn, columnItemIndex: 0));
+            //   _onItemMoved(from,
+            //       ItemBoardPosition(columnIndex: toColumn, columnItemIndex: 0));
             // },
             onItemMoved: (from, to) => _onItemMoved(from, to),
           ),
