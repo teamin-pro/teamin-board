@@ -237,7 +237,7 @@ class _TeaminBoardState extends State<TeaminBoard>
     final column = widget.columns[columnIndex];
     final config = widget.boardConfig;
 
-    return ListView.builder(
+    return config.columnListBuilder.createList(
       controller: scrollController,
       itemCount: column.items.length,
       itemBuilder: (context, index) {

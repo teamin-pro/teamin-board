@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:teamin_board/src/column_list_builder.dart';
 import 'package:teamin_board/src/utils.dart';
 
 class BoardConfig {
@@ -7,6 +8,7 @@ class BoardConfig {
     this.columnsSpacing = 8,
     this.maxColumnWidth = 300,
     this.showScrollThresholdDebugOverlay = false,
+    this.columnListBuilder = const ColumnListBuilder(),
   });
 
   double calculateScrollThreshold(BuildContext context, Axis axis) {
@@ -52,4 +54,9 @@ class BoardConfig {
   Widget childPreviewBuilder(BuildContext context, Widget child) {
     return Opacity(opacity: 0.5, child: child);
   }
+
+  /// The builder for the column (cards) list.
+  /// 
+  /// You can provide your own implementation using [CustomScrollView] or anything else.
+  final ColumnListBuilderDelegate columnListBuilder;
 }
