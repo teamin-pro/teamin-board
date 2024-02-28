@@ -222,7 +222,7 @@ class _TeaminBoardState extends State<TeaminBoard>
         controller: _boardHorizontalScrollController,
         scrollDirection: Axis.horizontal,
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (widget.start != null) widget.start!,
             ...columnsChildren,
