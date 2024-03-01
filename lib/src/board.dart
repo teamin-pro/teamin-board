@@ -133,7 +133,7 @@ class _TeaminBoardState extends State<TeaminBoard>
   Widget build(BuildContext context) {
     final config = widget.boardConfig;
     final columns = widget.columns;
-    final columnsChildren = <Widget>[];
+    final columnsChildren = <Widget>[if (widget.start != null) widget.start!];
     for (var columnIndex = 0; columnIndex < columns.length; columnIndex++) {
       final column = columns[columnIndex];
       final scrollController = column.scrollController ??
@@ -204,6 +204,7 @@ class _TeaminBoardState extends State<TeaminBoard>
         ),
       );
     }
+    if (widget.end != null) columnsChildren.add(widget.end!);
 
     return BoardScrollListener(
       onDrag: (scrollData, position) {
@@ -218,17 +219,10 @@ class _TeaminBoardState extends State<TeaminBoard>
       },
       thresholdCalculator: config.calculateScrollThreshold,
       showDebugOverlay: config.showScrollThresholdDebugOverlay,
-      child: SingleChildScrollView(
+      child: config.boardColumnsBuilder.createList(
         controller: _boardHorizontalScrollController,
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (widget.start != null) widget.start!,
-            ...columnsChildren,
-            if (widget.end != null) widget.end!,
-          ],
-        ),
+        itemCount: columnsChildren.length,
+        itemBuilder: (_, index) => columnsChildren[index],
       ),
     );
   }

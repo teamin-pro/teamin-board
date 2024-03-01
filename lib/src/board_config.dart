@@ -9,6 +9,7 @@ class BoardConfig {
     this.maxColumnWidth = 300,
     this.showScrollThresholdDebugOverlay = false,
     this.columnListBuilder = const ColumnListBuilder(),
+    this.boardColumnsBuilder = const BoardColumnsBuilder(),
   });
 
   double calculateScrollThreshold(BuildContext context, Axis axis) {
@@ -56,7 +57,10 @@ class BoardConfig {
   }
 
   /// The builder for the column (cards) list.
-  /// 
+  ///
   /// You can provide your own implementation using [CustomScrollView] or anything else.
   final ColumnListBuilderDelegate columnListBuilder;
+
+  /// The builder for the board columns list.
+  final ColumnListBuilderDelegate boardColumnsBuilder;
 }
