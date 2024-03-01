@@ -34,7 +34,7 @@ class BoardConfig {
 
   double calculateMaxScrollSpeed(BuildContext context, Axis axis) {
     if (Theme.of(context).platform.isMobile) {
-      return 16;
+      return 20;
     } else {
       return switch (MediaQuery.sizeOf(context).width) {
         < 800 => 20,
