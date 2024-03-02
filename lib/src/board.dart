@@ -69,7 +69,6 @@ class _TeaminBoardState extends State<TeaminBoard>
 
   void _onDragStarted(BoardPosition position) {
     _dragController.startItemPosition = position;
-    widget.controller.isDragging = true;
   }
 
   void _onItemDropped(BoardPosition newPosition) {
@@ -87,7 +86,6 @@ class _TeaminBoardState extends State<TeaminBoard>
         assert(false, 'Unexpected board position');
     }
     _dragController.clean();
-    widget.controller.isDragging = false;
   }
 
   ScrollController? _scrollControllerFromPosition(Offset position) {
@@ -106,7 +104,16 @@ class _TeaminBoardState extends State<TeaminBoard>
   }
 
   @override
+  void initState() {
+    super.initState();
+    _dragController.addListener(
+      () => widget.controller.isDragging = _dragController.isDragging,
+    );
+  }
+
+  @override
   void dispose() {
+    _dragController.dispose();
     _defaultBoardHorizontalScrollController.dispose();
     _boardScrollController.dispose();
     for (var controller in _columnsScrollControllers.values) {
@@ -202,6 +209,7 @@ class _TeaminBoardState extends State<TeaminBoard>
       },
       onDragEnd: () {
         _lastPosition = null;
+        _dragController.clean();
         _boardScrollController.stopScroll();
       },
       thresholdCalculator: config.calculateScrollThreshold,
