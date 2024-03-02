@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:teamin_board/src/board_models.dart';
+import 'package:meta/meta.dart';
 
 typedef OnItemMoved = void Function(
   ItemBoardPosition from,
@@ -29,6 +30,7 @@ class BoardController extends ChangeNotifier {
 
   /// Whether an item (card or column) is currently being dragged.
   bool get isDragging => _isDragging;
+  @internal
   set isDragging(bool value) {
     if (_isDragging != value) {
       _isDragging = value;

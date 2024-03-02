@@ -69,6 +69,7 @@ class _TeaminBoardState extends State<TeaminBoard>
 
   void _onDragStarted(BoardPosition position) {
     _dragController.startItemPosition = position;
+    widget.controller.isDragging = true;
   }
 
   void _onItemDropped(BoardPosition newPosition) {
@@ -86,6 +87,7 @@ class _TeaminBoardState extends State<TeaminBoard>
         assert(false, 'Unexpected board position');
     }
     _dragController.clean();
+    widget.controller.isDragging = false;
   }
 
   ScrollController? _scrollControllerFromPosition(Offset position) {
