@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:teamin_board/src/board_config.dart';
+import 'package:teamin_board/src/board_controller.dart';
 import 'package:teamin_board/src/board_models.dart';
 import 'package:teamin_board/src/board_scroll_listener.dart';
 import 'package:teamin_board/src/board_scroll_controller.dart';
@@ -10,23 +11,11 @@ import 'package:teamin_board/src/drag_controller.dart';
 import 'package:teamin_board/src/draggable_item_widget.dart';
 import 'package:teamin_board/src/utils.dart';
 
-typedef OnItemMoved = void Function(
-  ItemBoardPosition from,
-  ItemBoardPosition to,
-);
-typedef OnColumnMoved = void Function(int from, int to);
-typedef OnItemMovedToColumn = void Function(
-  ItemBoardPosition from,
-  int toColumn,
-);
-
 class TeaminBoard extends StatefulWidget {
   const TeaminBoard({
     super.key,
     required this.columns,
-    this.onColumnMoved,
-    this.onItemMoved,
-    this.onItemMovedToColumn,
+    required this.controller,
     this.boardConfig = const BoardConfig(),
     this.boardScrollController,
     this.start,
@@ -34,14 +23,8 @@ class TeaminBoard extends StatefulWidget {
   });
 
   final List<BoardColumn> columns;
+  final BoardController controller;
   final BoardConfig boardConfig;
-
-  /// Called when an item is moved from one position to another.
-  ///
-  /// Items can be moved from any column position to any other column position when this is provided.
-  final OnItemMoved? onItemMoved;
-  final OnColumnMoved? onColumnMoved;
-  final OnItemMovedToColumn? onItemMovedToColumn;
 
   /// Widget to be displayed as the first column.
   final Widget? start;
@@ -93,11 +76,12 @@ class _TeaminBoardState extends State<TeaminBoard>
     assert(oldPosition != null);
     switch ((oldPosition, newPosition)) {
       case (ItemBoardPosition oldP, ItemBoardPosition newP):
-        widget.onItemMoved?.call(oldP, newP);
+        widget.controller.onItemMoved?.call(oldP, newP);
       case (ColumnBoardPosition oldP, ColumnBoardPosition newP):
-        widget.onColumnMoved?.call(oldP.columnIndex, newP.columnIndex);
+        widget.controller.onColumnMoved
+            ?.call(oldP.columnIndex, newP.columnIndex);
       case (ItemBoardPosition oldP, ColumnBoardPosition newP):
-        widget.onItemMovedToColumn?.call(oldP, newP.columnIndex);
+        widget.controller.onItemMovedToColumn?.call(oldP, newP.columnIndex);
       default:
         assert(false, 'Unexpected board position');
     }
@@ -169,12 +153,13 @@ class _TeaminBoardState extends State<TeaminBoard>
             },
             columnItem: ColumnItem(
               key: column.key,
-              isDraggable: column.isDraggable ?? widget.onColumnMoved != null,
+              isDraggable:
+                  column.isDraggable ?? widget.controller.onColumnMoved != null,
               builder: (_) => MetaData(
                 // Provide column scroll controller that can be received from the `WidgetsBinding.hitTestInView`.
                 metaData: scrollController,
                 child: ColumnHover(
-                  enabled: widget.onItemMovedToColumn != null,
+                  enabled: widget.controller.onItemMovedToColumn != null,
                   onItemDropped: () {
                     if (_dragController.startItemPosition?.columnIndex !=
                         columnIndex) {
@@ -260,7 +245,7 @@ class _TeaminBoardState extends State<TeaminBoard>
               columnIndex: columnIndex,
               columnItemIndex: index,
             ),
-            onItemDropped: widget.onItemMoved != null
+            onItemDropped: widget.controller.onItemMoved != null
                 ? (side) {
                     final columnItemIndex =
                         side == DragItemSide.before ? index : index + 1;

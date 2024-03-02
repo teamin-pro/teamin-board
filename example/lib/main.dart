@@ -28,11 +28,26 @@ class BoardExampleScreen extends StatefulWidget {
 }
 
 class _BoardExampleScreenState extends State<BoardExampleScreen> {
-  static const _listItems = 21;
+  late final _controller = BoardController(
+    onColumnMoved: (from, to) {
+      final list = _lists.removeAt(from);
+      if (from < to) to--;
+      _lists.insert(to, list);
+      setState(() {});
+    },
+    // Uncomment this to test item to column mode.
+    // onItemMovedToColumn: (from, toColumn) {
+    //   _onItemMoved(from,
+    //       ItemBoardPosition(columnIndex: toColumn, columnItemIndex: 0));
+    // },
+    onItemMoved: (from, to) => _onItemMoved(from, to),
+  );
+
   final _lists = [
     for (var i = 0; i < 10; i++)
       (i, [for (var j = 0; j < _listItems; j++) j + i * _listItems]),
   ];
+  static const _listItems = 21;
   static const _shortText = 'Mauris sed nunc a leo rhoncus ornare';
   static const _mediumText =
       'Maecenas eu felis cursus, maximus turpis nec, aliquam et molestie sapien augue';
@@ -61,6 +76,7 @@ class _BoardExampleScreenState extends State<BoardExampleScreen> {
         child: SafeArea(
           top: false,
           child: TeaminBoard(
+            controller: _controller,
             boardConfig:
                 const BoardConfig(showScrollThresholdDebugOverlay: false),
             start: const SizedBox(width: 8),
@@ -115,18 +131,6 @@ class _BoardExampleScreenState extends State<BoardExampleScreen> {
                   ],
                 ),
             ],
-            onColumnMoved: (from, to) {
-              final list = _lists.removeAt(from);
-              if (from < to) to--;
-              _lists.insert(to, list);
-              setState(() {});
-            },
-            // Uncomment this to test item to column mode.
-            // onItemMovedToColumn: (from, toColumn) {
-            //   _onItemMoved(from,
-            //       ItemBoardPosition(columnIndex: toColumn, columnItemIndex: 0));
-            // },
-            onItemMoved: (from, to) => _onItemMoved(from, to),
           ),
         ),
       ),
