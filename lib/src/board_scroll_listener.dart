@@ -18,6 +18,7 @@ class BoardScrollListener extends StatefulWidget {
     required this.child,
     required this.onDrag,
     required this.onDragEnd,
+    required this.onStopScroll,
     required this.thresholdCalculator,
     this.showDebugOverlay = false,
   });
@@ -25,6 +26,7 @@ class BoardScrollListener extends StatefulWidget {
   final Widget child;
   final void Function(Set<ScrollInfo> scrollData, Offset position) onDrag;
   final VoidCallback onDragEnd;
+  final VoidCallback onStopScroll;
   final ScrollThresholdCalculator thresholdCalculator;
   final bool showDebugOverlay;
 
@@ -37,9 +39,15 @@ class _BoardScrollListenerState extends State<BoardScrollListener> {
   double _horizontalScrollThreshold = 0;
   double _verticalScrollThreshold = 0;
 
-  void _onStopDrag() {
+  void _onDragStopped() {
     _boardRect = null;
     widget.onDragEnd();
+    widget.onStopScroll();
+  }
+
+  void _onStopScroll() {
+    _boardRect = null;
+    widget.onStopScroll();
   }
 
   void _onMove(Offset position) {
@@ -74,7 +82,7 @@ class _BoardScrollListenerState extends State<BoardScrollListener> {
       if (scrollData.isNotEmpty) {
         widget.onDrag(scrollData, position);
       } else {
-        _onStopDrag();
+        _onStopScroll();
       }
     }
   }
@@ -146,8 +154,8 @@ class _BoardScrollListenerState extends State<BoardScrollListener> {
 
     return Listener(
       onPointerMove: (event) => _onMove(event.position),
-      onPointerUp: (_) => _onStopDrag(),
-      onPointerCancel: (_) => _onStopDrag(),
+      onPointerUp: (_) => _onDragStopped(),
+      onPointerCancel: (_) => _onDragStopped(),
       child: child,
     );
   }

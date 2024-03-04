@@ -208,8 +208,13 @@ class _TeaminBoardState extends State<TeaminBoard>
         _boardScrollController.scrollDataUpdated(scrollData: scrollData);
       },
       onDragEnd: () {
+        // Clean drag controller on the next frame as this callback is called before the `onItemDropped`.
+        WidgetsBinding.instance.addPostFrameCallback(
+          (_) => _dragController.clean(),
+        );
+      },
+      onStopScroll: () {
         _lastPosition = null;
-        _dragController.clean();
         _boardScrollController.stopScroll();
       },
       thresholdCalculator: config.calculateScrollThreshold,
