@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:teamin_board/src/draggable_item_widget.dart';
 
-class ColumnHover extends StatelessWidget {
-  const ColumnHover({
+class ColumnDragTarget extends StatelessWidget {
+  const ColumnDragTarget({
     super.key,
     required this.onItemDropped,
     required this.enabled,

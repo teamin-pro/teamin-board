@@ -37,17 +37,21 @@ class _BoardExampleScreenState extends State<BoardExampleScreen> {
     },
     // Uncomment this to test item to column mode.
     // onItemMovedToColumn: (from, toColumn) {
-    //   _onItemMoved(from,
-    //       ItemBoardPosition(columnIndex: toColumn, columnItemIndex: 0));
+    //   _onItemMoved(
+    //     from,
+    //     ItemBoardPosition(columnIndex: toColumn, columnItemIndex: 0),
+    //   );
     // },
     onItemMoved: (from, to) => _onItemMoved(from, to),
   );
 
   final _lists = [
-    for (var i = 0; i < 10; i++)
-      (i, [for (var j = 0; j < _listItems; j++) j + i * _listItems]),
+    (0, [for (var j = 1; j < 10; j++) j]),
+    (1, [for (var j = 1; j < 2; j++) j * 10]),
+    (2, [for (var j = 1; j < 15; j++) j * 100]),
+    (2, [for (var j = 1; j < 0; j++) j * 1000]),
+    (2, [for (var j = 1; j < 6; j++) j * 10000]),
   ];
-  static const _listItems = 21;
   static const _shortText = 'Mauris sed nunc a leo rhoncus ornare';
   static const _mediumText =
       'Maecenas eu felis cursus, maximus turpis nec, aliquam et molestie sapien augue';
@@ -82,14 +86,22 @@ class _BoardExampleScreenState extends State<BoardExampleScreen> {
             start: const SizedBox(width: 8),
             end: const SizedBox(width: 8),
             columns: [
-              for (final (key, items) in _lists)
+              for (final (index, (key, items)) in _lists.indexed)
                 BoardColumn(
                   key: key,
-                  columnDecorationBuilder: (context, column, isHovered) {
-                    return Card(
-                      elevation: isHovered ? 4 : 0,
-                      margin: EdgeInsets.zero,
-                      color: Colors.grey[200],
+                  columnDecorationBuilder: (context, column) {
+                    return ListenableBuilder(
+                      listenable: _controller.dragController,
+                      builder: (context, child) {
+                        final isHovered =
+                            _controller.dragController.shouldHoverColumn(index);
+                        return Card(
+                          elevation: isHovered ? 4 : 0,
+                          margin: EdgeInsets.zero,
+                          color: Colors.grey[200],
+                          child: child,
+                        );
+                      },
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Column(

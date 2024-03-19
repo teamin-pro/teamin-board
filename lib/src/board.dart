@@ -4,10 +4,9 @@ import 'package:flutter/widgets.dart';
 import 'package:teamin_board/src/board_config.dart';
 import 'package:teamin_board/src/board_controller.dart';
 import 'package:teamin_board/src/board_models.dart';
-import 'package:teamin_board/src/board_scroll_listener.dart';
+import 'package:teamin_board/src/board_drag_listener.dart';
 import 'package:teamin_board/src/board_scroll_controller.dart';
-import 'package:teamin_board/src/column_hover.dart';
-import 'package:teamin_board/src/drag_controller.dart';
+import 'package:teamin_board/src/column_drag_target.dart';
 import 'package:teamin_board/src/draggable_item_widget.dart';
 import 'package:teamin_board/src/utils.dart';
 
@@ -39,7 +38,7 @@ class TeaminBoard extends StatefulWidget {
 
 class _TeaminBoardState extends State<TeaminBoard>
     with SingleTickerProviderStateMixin {
-  final _dragController = DragController();
+  late final _dragController = widget.controller.dragController;
   final _defaultBoardHorizontalScrollController = ScrollController();
   final _columnsScrollControllers = <Object, ScrollController>{};
   late final _flutterView = View.of(context);
@@ -49,23 +48,12 @@ class _TeaminBoardState extends State<TeaminBoard>
     maxScrollSpeedSelector: (axis) {
       return widget.boardConfig.calculateMaxScrollSpeed(context, axis);
     },
-    verticalScrollControllerSelector: () {
-      final position = _lastPosition;
-      if (position != null &&
-          // Scroll column only when board item is dragging.
-          _dragController.startItemPosition is ItemBoardPosition) {
-        return _scrollControllerFromPosition(position);
-      }
-      return null;
-    },
   );
 
   ScrollController get _boardHorizontalScrollController {
     return widget.boardScrollController ??
         _defaultBoardHorizontalScrollController;
   }
-
-  Offset? _lastPosition;
 
   void _onDragStarted(BoardPosition position) {
     _dragController.startItemPosition = position;
@@ -88,7 +76,7 @@ class _TeaminBoardState extends State<TeaminBoard>
     _dragController.clean();
   }
 
-  ScrollController? _scrollControllerFromPosition(Offset position) {
+  _ColumnMetadata? _columnMetadataFromPosition(Offset position) {
     final hitTestResult = HitTestResult();
     WidgetsBinding.instance.hitTestInView(
       hitTestResult,
@@ -96,7 +84,7 @@ class _TeaminBoardState extends State<TeaminBoard>
       _flutterView.viewId,
     );
     for (final target in hitTestResult.path) {
-      if (target.target case RenderMetaData(:final ScrollController metaData)) {
+      if (target.target case RenderMetaData(:final _ColumnMetadata metaData)) {
         return metaData;
       }
     }
@@ -104,16 +92,7 @@ class _TeaminBoardState extends State<TeaminBoard>
   }
 
   @override
-  void initState() {
-    super.initState();
-    _dragController.addListener(
-      () => widget.controller.isDragging = _dragController.isDragging,
-    );
-  }
-
-  @override
   void dispose() {
-    _dragController.dispose();
     _defaultBoardHorizontalScrollController.dispose();
     _boardScrollController.dispose();
     for (var controller in _columnsScrollControllers.values) {
@@ -134,6 +113,10 @@ class _TeaminBoardState extends State<TeaminBoard>
             column.key,
             () => ScrollController(debugLabel: column.key.toString()),
           );
+      final _ColumnMetadata columnMetadata = (
+        columnIndex: columnIndex,
+        controller: scrollController,
+      );
       columnsChildren.add(
         DragItem(
           vm: DragItemVm(
@@ -166,9 +149,10 @@ class _TeaminBoardState extends State<TeaminBoard>
                   column.isDraggable ?? widget.controller.onColumnMoved != null,
               builder: (_) => MetaData(
                 // Provide column scroll controller that can be received from the `WidgetsBinding.hitTestInView`.
-                metaData: scrollController,
-                child: ColumnHover(
-                  enabled: widget.controller.onItemMovedToColumn != null,
+                metaData: columnMetadata,
+                child: ColumnDragTarget(
+                  // enabled: widget.controller.onItemMovedToColumn != null,
+                  enabled: true,
                   onItemDropped: () {
                     if (_dragController.startItemPosition?.columnIndex !=
                         columnIndex) {
@@ -185,9 +169,6 @@ class _TeaminBoardState extends State<TeaminBoard>
                       child: column.columnDecorationBuilder(
                         context,
                         _buildColumnList(columnIndex, scrollController),
-                        isHovered &&
-                            _dragController.startItemPosition?.columnIndex !=
-                                columnIndex,
                       ),
                     );
                   },
@@ -200,12 +181,20 @@ class _TeaminBoardState extends State<TeaminBoard>
     }
     if (widget.end != null) columnsChildren.add(widget.end!);
 
-    return BoardScrollListener(
+    return BoardDragListener(
       onDrag: (scrollData, position) {
         // This callback may be called when user drag scroll bar.
         if (!_dragController.isDragging) return;
-        _lastPosition = position;
-        _boardScrollController.scrollDataUpdated(scrollData: scrollData);
+        final columnMetadata = _columnMetadataFromPosition(position);
+        _dragController.hoveredColumnIndex = columnMetadata?.columnIndex;
+        final boardItemIsDragging =
+            _dragController.startItemPosition is ItemBoardPosition;
+        _boardScrollController.scrollDataUpdated(
+          scrollData: scrollData,
+          // Scroll column only when board item is dragging.
+          verticalScrollController:
+              boardItemIsDragging ? columnMetadata?.controller : null,
+        );
       },
       onDragEnd: () {
         // Clean drag controller on the next frame as this callback is called before the `onItemDropped`.
@@ -213,10 +202,7 @@ class _TeaminBoardState extends State<TeaminBoard>
           (_) => _dragController.clean(),
         );
       },
-      onStopScroll: () {
-        _lastPosition = null;
-        _boardScrollController.stopScroll();
-      },
+      onStopScroll: () => _boardScrollController.stopScroll(),
       thresholdCalculator: config.calculateScrollThreshold,
       showDebugOverlay: config.showScrollThresholdDebugOverlay,
       child: config.boardColumnsBuilder.createList(
@@ -292,3 +278,8 @@ class _TeaminBoardState extends State<TeaminBoard>
     return DragItemListPosition.between;
   }
 }
+
+typedef _ColumnMetadata = ({
+  int columnIndex,
+  ScrollController controller,
+});

@@ -11,7 +11,6 @@ class BoardScrollController {
   BoardScrollController({
     required TickerProvider vsync,
     required this.horizontalScrollController,
-    required this.verticalScrollControllerSelector,
     required this.maxScrollSpeedSelector,
   }) {
     _scrollTicker = vsync.createTicker(_scrollOnTick);
@@ -19,11 +18,15 @@ class BoardScrollController {
 
   late Ticker _scrollTicker;
   final ScrollController horizontalScrollController;
-  final ScrollController? Function() verticalScrollControllerSelector;
   final double Function(Axis axis) maxScrollSpeedSelector;
+  ScrollController? _verticalScrollController;
   var _scrollData = <ScrollInfo>{};
 
-  void scrollDataUpdated({required Set<ScrollInfo> scrollData}) {
+  void scrollDataUpdated({
+    required Set<ScrollInfo> scrollData,
+    required ScrollController? verticalScrollController,
+  }) {
+    _verticalScrollController = verticalScrollController;
     if (scrollData.isEmpty || setEquals(_scrollData, scrollData)) return;
 
     _scrollData = scrollData;
@@ -49,7 +52,7 @@ class BoardScrollController {
       final direction = scrollInfo.direction;
       final controller = direction.isHorizontal
           ? horizontalScrollController
-          : verticalScrollControllerSelector();
+          : _verticalScrollController;
       if (controller == null || !controller.hasClients) return;
 
       final delta = scrollInfo.speedFactor.abs() *

@@ -47,11 +47,9 @@ class ItemBoardPosition extends BoardPosition {
 /// The builder to decorate the column.
 ///
 /// The [column] is the column widget.
-/// The [isHovered] is true when the column is hovered by card.
 typedef ColumnDecorationBuilder = Widget Function(
   BuildContext context,
   Widget column,
-  bool isHovered,
 );
 
 class BoardColumn {

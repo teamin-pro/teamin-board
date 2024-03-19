@@ -3,7 +3,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:teamin_board/src/drag_controller.dart';
 import 'package:teamin_board/src/utils.dart';
 import 'package:teamin_board/teamin_board.dart';
 

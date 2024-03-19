@@ -12,8 +12,8 @@ typedef ScrollThresholdCalculator = double Function(
   Axis axis,
 );
 
-class BoardScrollListener extends StatefulWidget {
-  const BoardScrollListener({
+class BoardDragListener extends StatefulWidget {
+  const BoardDragListener({
     super.key,
     required this.child,
     required this.onDrag,
@@ -31,10 +31,10 @@ class BoardScrollListener extends StatefulWidget {
   final bool showDebugOverlay;
 
   @override
-  State<BoardScrollListener> createState() => _BoardScrollListenerState();
+  State<BoardDragListener> createState() => _BoardDragListenerState();
 }
 
-class _BoardScrollListenerState extends State<BoardScrollListener> {
+class _BoardDragListenerState extends State<BoardDragListener> {
   Rect? _boardRect;
   double _horizontalScrollThreshold = 0;
   double _verticalScrollThreshold = 0;
@@ -79,9 +79,8 @@ class _BoardScrollListenerState extends State<BoardScrollListener> {
         scrollData.add((direction: AxisDirection.up, speedFactor: upSpeed));
       }
 
-      if (scrollData.isNotEmpty) {
-        widget.onDrag(scrollData, position);
-      } else {
+      widget.onDrag(scrollData, position);
+      if (scrollData.isEmpty) {
         _onStopScroll();
       }
     }
