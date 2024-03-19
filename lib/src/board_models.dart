@@ -70,6 +70,18 @@ class BoardColumn {
 
   /// The builder to decorate the column.
   final ColumnDecorationBuilder columnDecorationBuilder;
+  
+  BoardColumn copyWith({
+    List<ColumnItem>? items,
+  }) {
+    return BoardColumn(
+      key: key,
+      items: items ?? this.items,
+      columnDecorationBuilder: columnDecorationBuilder,
+      isDraggable: isDraggable,
+      scrollController: scrollController,
+    );
+  }
 }
 
 class ColumnItem {

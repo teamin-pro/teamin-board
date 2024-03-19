@@ -8,7 +8,6 @@ import 'package:teamin_board/src/board_drag_listener.dart';
 import 'package:teamin_board/src/board_scroll_controller.dart';
 import 'package:teamin_board/src/column_drag_target.dart';
 import 'package:teamin_board/src/draggable_item_widget.dart';
-import 'package:teamin_board/src/utils.dart';
 
 class TeaminBoard extends StatefulWidget {
   const TeaminBoard({
@@ -151,24 +150,34 @@ class _TeaminBoardState extends State<TeaminBoard>
                 // Provide column scroll controller that can be received from the `WidgetsBinding.hitTestInView`.
                 metaData: columnMetadata,
                 child: ColumnDragTarget(
-                  // enabled: widget.controller.onItemMovedToColumn != null,
-                  enabled: true,
-                  onItemDropped: () {
-                    if (_dragController.startItemPosition?.columnIndex !=
-                        columnIndex) {
-                      _onItemDropped(
-                        ColumnBoardPosition(columnIndex: columnIndex),
-                      );
-                    }
+                  enabled: widget.controller.onItemMoved != null &&
+                      column.items.isEmpty,
+                  onItemDropped: (candidateVm) {
+                    _onItemDropped(
+                      ItemBoardPosition(
+                        columnIndex: columnIndex,
+                        columnItemIndex: 0,
+                      ),
+                    );
                   },
-                  builder: (isHovered) {
+                  builder: (candidateVm) {
+                    assert(candidateVm == null || column.items.isEmpty);
                     return ConstrainedBox(
                       constraints: BoxConstraints(
                         maxWidth: config.maxColumnWidth,
                       ),
                       child: column.columnDecorationBuilder(
                         context,
-                        _buildColumnList(columnIndex, scrollController),
+                        _buildColumnList(
+                          columnIndex: columnIndex,
+                          scrollController: scrollController,
+                          placeholder: candidateVm != null
+                              ? candidateVm.childPreviewBuilder(
+                                  context,
+                                  candidateVm.columnItem.builder(context),
+                                )
+                              : null,
+                        ),
                       ),
                     );
                   },
@@ -213,14 +222,19 @@ class _TeaminBoardState extends State<TeaminBoard>
     );
   }
 
-  Widget _buildColumnList(int columnIndex, ScrollController scrollController) {
+  Widget _buildColumnList({
+    required int columnIndex,
+    required ScrollController scrollController,
+    required Widget? placeholder,
+  }) {
     final column = widget.columns[columnIndex];
     final config = widget.boardConfig;
 
     return config.columnListBuilder.createList(
       controller: scrollController,
-      itemCount: column.items.length,
+      itemCount: placeholder != null ? 1 : column.items.length,
       itemBuilder: (context, index) {
+        if (placeholder != null) return placeholder;
         return DragItem(
           vm: DragItemVm(
             childWhenDraggingBuilder: config.childWhenDraggingBuilder,

@@ -9,16 +9,16 @@ class ColumnDragTarget extends StatelessWidget {
     required this.builder,
   });
 
-  final VoidCallback onItemDropped;
+  final ValueChanged<DragItemVm> onItemDropped;
   final bool enabled;
-  final Widget Function(bool isHovered) builder;
+  final Widget Function(DragItemVm? candidateVm) builder;
 
   @override
   Widget build(BuildContext context) {
     return DragTarget<DragItemVm>(
       onWillAcceptWithDetails: (_) => enabled,
-      onAcceptWithDetails: (_) => onItemDropped(),
-      builder: (_, candidateData, __) => builder(candidateData.isNotEmpty),
+      onAcceptWithDetails: (details) => onItemDropped(details.data),
+      builder: (_, candidateData, __) => builder(candidateData.firstOrNull),
     );
   }
 }
